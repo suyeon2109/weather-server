@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.gbsoft.weather.mybatis.mapper.WeatherMapper">
+	<select id="getWeather" resultType="GetWeatherVo">
+		<![CDATA[
+		SELECT oh.cityId
+			 ,oh.current
+			 ,c.Sido
+			 ,c.weatherName
+			 ,ai.FineDustConcentration pm10
+			 ,ai.UltrafineDustConcentration pm25
+		FROM OPENWEATHER_HOURLY oh
+			 LEFT JOIN CITYNAME c ON oh.cityId = c.cityId
+			 LEFT JOIN AIRQUALITY_INFO ai ON oh.cityId = ai.CityId
+		WHERE oh.cityId=#{cityId}
+		]]>
+	</select>
+
+	<select id="getOneCallWeather" resultType="GetOneCallWeatherVo">
+		<![CDATA[
+		SELECT tmmt.cityId
+			  ,ai.FineDustConcentration as pm10
+			  ,ai.UltrafineDustConcentration as pm25
+			  ,ai.OzoneConcentration as ozon
+			  ,tmmt.maxTemp
+			  ,tmmt.minTemp
+			  ,wir.Temperatures as temp
+			  ,wir.PrecipitationProbability as pop
+			  ,wir.Humidity as humidity
+			  ,wir.windSpeed
+			  ,wir.windDirection
+			  ,wir.Weather
+			  ,wir.hour24
+			  ,wir.hour03
+			  ,wir.hour06
+			  ,wir.hour09
+			  ,wir.hour12
+			  ,wir.hour15
+			  ,wir.hour18
+			  ,wir.hour21
+			  ,wi.weekT1
+			  ,wi.weekTH1
+			  ,weekPop1
+			  ,weekK1
+			  ,wi.weekT2
+			  ,wi.weekTH2
+			  ,weekPop2
+			  ,weekK2
+			  ,wi.weekT3
+			  ,wi.weekTH3
+			  ,weekPop3
+			  ,weekK3
+			  ,wi.weekT4
+			  ,wi.weekTH4
+			  ,weekPop4
+			  ,weekK4
+			  ,wi.weekT5
+			  ,wi.weekTH5
+			  ,weekPop5
+			  ,weekK5
+			  ,wi.weekT6
+			  ,wi.weekTH6
+			  ,weekPop6
+			  ,weekK6
+			  ,wi.weekT7
+			  ,wi.weekTH7
+			  ,weekPop7
+			  ,weekK7
+		  FROM TODAY_MIN_MAX_TEMP tmmt
+			   LEFT JOIN AIRQUALITY_INFO ai ON tmmt.cityId  = ai.CityId
+			   LEFT JOIN WEATHER_INFO wi ON tmmt.cityId = wi.CityId
+			   LEFT JOIN WEATHER_INFO_RSS wir ON tmmt.cityId = wir.CityId
+	     WHERE tmmt.cityId=#{cityId}
+		]]>
+	</select>
+
+	<select id="getDust" resultType="GetDustVo">
+		<![CDATA[
+		SELECT ai.FineDustConcentration
+		      ,ai.UltrafineDustConcentration
+		  FROM AIRQUALITY_INFO ai
+		 WHERE cityId=#{cityId}
+		]]>
+	</select>
+
+
+</mapper>

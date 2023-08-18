@@ -1,0 +1,53 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    url: jdbc:log4jdbc:mariadb://3.39.57.164:3306/weather
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    username: weather
+    password: wlql12!
+
+logging:
+  level:
+    com.gbsoft.weather.controller: info
+    com.tutorial: info
+    com:samply:mybatis:mapper: info
+    org.hibernate.type: info #SQL 파라미터 파인딩 확인용
+
+# mybatis settings
+mybatis:
+  type-aliases-package: com.gbsoft.weather.mybatis.model
+  mapper-locations: classpath:mapper/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+#actuator
+#활성 & 노출
+management:
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+    env:
+      enabled: true
+  server:
+    port: 8080
+    #port: 9092
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+info:
+  app:
+    name: weather
+    company : gbsoft
