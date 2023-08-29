@@ -1,11 +1,14 @@
 package com.gbsoft.weather.mybatis.mapper;
 
+import com.gbsoft.weather.mybatis.model.CityNameVo;
 import com.gbsoft.weather.mybatis.model.GetDustVo;
 import com.gbsoft.weather.mybatis.model.GetOneCallWeatherVo;
 import com.gbsoft.weather.mybatis.model.GetWeatherVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Mapper
@@ -17,4 +20,8 @@ public interface WeatherMapper {
     Optional<GetOneCallWeatherVo> getOneCallWeather(Long cityId);
 
     Optional<GetDustVo> getDust(int cityId);
+
+	List<CityNameVo> getCityName();
+
+	void saveAirDataToDB(List<Map<String, Object>> list, int initialNum, int finalNum);
 }

@@ -5,10 +5,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:log4jdbc:mariadb://3.39.57.164:3306/weather
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    username: weather
-    password: wlql12!
+    url: jdbc:mariadb://gb-gblite-dev-rds.cww5ax3bcsku.ap-northeast-2.rds.amazonaws.com:3306/weather?allowMultiQueries=true
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: gbadmin
+    password: wlqlthvmxm1!
 
 logging:
   level:

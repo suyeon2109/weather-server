@@ -1,10 +1,11 @@
 package com.gbsoft.weather.controller;
 
+import com.gbsoft.weather.dto.getDustRequestDto;
 import com.gbsoft.weather.exception.InvalidRequestException;
 import com.gbsoft.weather.mybatis.model.GetDustResponse;
 import com.gbsoft.weather.mybatis.model.GetOneCallWeatherResponse;
 import com.gbsoft.weather.mybatis.model.GetWeatherVo;
-import com.gbsoft.weather.service.SearchService;
+import com.gbsoft.weather.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final SearchService searchService;
+    private final WeatherService weatherService;
 
     @GetMapping("/getWeather")
     public ResponseEntity<GetWeatherVo> getWeather(@RequestParam("cityId") Long cityId) {
         validate(cityId);
-        GetWeatherVo weather = searchService.getWeather(cityId);
+        GetWeatherVo weather = weatherService.getWeather(cityId);
 
         return ResponseEntity.ok()
                 .body(weather);
@@ -51,7 +52,7 @@ public class SearchController {
         }
 
         validate2(cityId, mainCityCode, gugunCode);
-        GetOneCallWeatherResponse oneCallWeather = searchService.getOneCallWeather(cityId, mainCityCode, gugunCode);
+        GetOneCallWeatherResponse oneCallWeather = weatherService.getOneCallWeather(cityId, mainCityCode, gugunCode);
 
         return ResponseEntity.ok()
                 .body(oneCallWeather);
@@ -79,7 +80,7 @@ public class SearchController {
         int mainCityNum = requestDto.getMainCity();
         int gugunNum    = requestDto.getGugun();
 
-        GetDustResponse res = searchService.getDust(mainCityNum, gugunNum, true);
+        GetDustResponse res = weatherService.getDust(mainCityNum, gugunNum, true);
         return ResponseEntity.ok()
                 .body(res);
     }

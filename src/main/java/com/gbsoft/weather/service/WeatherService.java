@@ -1,5 +1,8 @@
 package com.gbsoft.weather.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import com.gbsoft.weather.mybatis.model.GetDustResponse;
 import com.gbsoft.weather.exception.NoSuchAirDataException;
 import com.gbsoft.weather.exception.NoSuchCityException;
@@ -10,6 +13,9 @@ import com.gbsoft.weather.mybatis.model.GetOneCallWeatherVo;
 import com.gbsoft.weather.mybatis.model.GetWeatherVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @Slf4j
-public class SearchService {
+@EnableScheduling
+public class WeatherService {
 
     private final WeatherMapper weatherMapper;
 
@@ -45,7 +52,7 @@ public class SearchService {
         return GetOneCallWeatherResponse.of(getOneCallWeatherVo);
     }
 
-    private int getCityIdForDB(int mainCityNum) {
+    public int getCityIdForDB(int mainCityNum) {
         int id = 0;
         if (mainCityNum != 0) {
             for (int i = 0; i < mainCityNum; i++) {

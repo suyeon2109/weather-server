@@ -1,4 +1,4 @@
-package com.gbsoft.weather.controller;
+package com.gbsoft.weather.dto;
 
 import lombok.Getter;
 

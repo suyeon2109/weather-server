@@ -86,5 +86,32 @@
 		]]>
 	</select>
 
+	<select id="getCityName" resultType="CityNameVo">
+		SELECT weatherName, dustName, x, y, rss_short
+		FROM CITYNAME
+		ORDER BY cityId asc
+	</select>
 
+	<update id="saveAirDataToDB" parameterType="List">
+		<choose>
+			<when test="list != null and list.size() != 0">
+				<foreach collection = 'list' index='index' item ='item' separator=';'>
+					UPDATE AIRQUALITY_INFO
+					SET Date = #{item.dataTime}
+					,FineDustConcentration = #{item.pm10Value}
+					,UltrafineDustConcentration = #{item.pm25Value}
+					,OzoneConcentration = #{item.o3Value}
+					WHERE CityId = #{item.cityId}
+				</foreach>
+			</when>
+			<otherwise>
+				UPDATE AIRQUALITY_INFO
+				SET Date = '-'
+				,FineDustConcentration = '-'
+				,UltrafineDustConcentration = '-'
+				,OzoneConcentration = '-'
+				WHERE CityId between #{initialNum} and #{finalNum}
+			</otherwise>
+		</choose>
+	</update>
 </mapper>
