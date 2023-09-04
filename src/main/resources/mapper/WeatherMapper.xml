@@ -114,4 +114,76 @@
 			</otherwise>
 		</choose>
 	</update>
+
+
+	<update id="saveWeatherInfoToDB" parameterType="com.gbsoft.weather.dto.WeatherInfoDto">
+		UPDATE WEATHER_INFO
+		SET Date = #{date}
+		  ,Temperatures = #{temperature}
+		  ,Weather = #{weather}
+		  ,PrecipitationProbability = #{precipitationProbability}
+		  ,WindSpeed = #{windSpeed}
+		  ,WindDirection = #{windDirection}
+		  ,Humidity = #{humidity}
+		  ,hourT1 = #{hourT1}
+		  ,hourTH1 = #{hourTH1}
+		  ,hourK1 = #{hourK1}
+		  ,hourT2 = #{hourT2}
+		  ,hourTH2 = #{hourTH2}
+		  ,hourK2 = #{hourK2}
+		  ,hourT3 = #{hourT3}
+		  ,hourTH3 = #{hourTH3}
+		  ,hourK3 = #{hourK3}
+		  ,weekT1 = #{weekT1}
+		  ,weekTH1 = #{weekTH1}
+		  ,weekPop1 = #{weekPop1}
+		  ,weekK1 = #{weekK1}
+		  ,weekT2 = #{weekT2}
+		  ,weekTH2 = #{weekTH2}
+		  ,weekPop2 = #{weekPop2}
+		  ,weekK2 = #{weekK2}
+		  ,weekT3 = #{weekT3}
+		  ,weekTH3 = #{weekTH3}
+		  ,weekPop3 = #{weekPop3}
+		  ,weekK3 = #{weekK3}
+		  ,weekT4 = #{weekT4}
+		  ,weekTH4 = #{weekTH4}
+		  ,weekPop4 = #{weekPop4}
+		  ,weekK4 = #{weekK4}
+		  ,weekT5 = #{weekT5}
+		  ,weekTH5 = #{weekTH5}
+		  ,weekPop5 = #{weekPop5}
+		  ,weekK5 = #{weekK5}
+		  ,weekT6 = #{weekT6}
+		  ,weekTH6 = #{weekTH6}
+		  ,weekPop6 = #{weekPop6}
+		  ,weekK6  = #{weekK6}
+		  ,weekT7 = #{weekT7}
+		  ,weekTH7 = #{weekTH7}
+		  ,weekPop7 = #{weekPop7}
+		  ,weekK7 = #{weekK7}
+		  ,updateTime = #{updateTime}
+		WHERE CityId = #{cityId}
+	</update>
+
+	<update id="saveWeatherInfoRssToDB" parameterType="com.gbsoft.weather.dto.WeatherInfoRssDto">
+		UPDATE WEATHER_INFO_RSS
+		SET Date = #{date}
+		  ,Temperatures = #{temperature}
+		  ,PrecipitationProbability = #{precipitationProbability}
+		  ,Humidity = #{humidity}
+		  ,WindSpeed = #{windSpeed}
+		  ,WindDirection = #{windDirection}
+		  ,Weather = #{weather}
+		  ,hour24 = #{hour24}
+		  ,hour03 = #{hour03}
+		  ,hour06 = #{hour06}
+		  ,hour09 = #{hour09}
+		  ,hour12 = #{hour12}
+		  ,hour15 = #{hour15}
+		  ,hour18 = #{hour18}
+		  ,hour21 = #{hour21}
+		  ,updateTime = #{updateTime}
+		WHERE CityId = #{cityId}
+	</update>
 </mapper>

@@ -1,7 +1,5 @@
 package com.gbsoft.weather.controller;
 
-import java.util.Properties;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
@@ -10,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gbsoft.weather.config.Scheduler;
+import com.gbsoft.weather.scheduler.Scheduler;
 import com.gbsoft.weather.dto.AuthCheckDto;
 import com.gbsoft.weather.service.WeatherService;
 
@@ -33,11 +31,14 @@ public class WeatherController {
 	@PostMapping("/startWeatherParsing")
 	public ResponseEntity weatherParsing(@RequestBody AuthCheckDto authCheckDto) throws Exception {
 		if("GB_WEATHER_SERVER_TIMER_START_REQUEST".equals(authCheckDto.getAuth())){
-			Properties properties = System.getProperties();
-			properties.put("schedule.air", "0 0 */1 * * *");
-			properties.put("schedule.weather", "0 0 */1 * * *");
+			// Properties properties = System.getProperties();
+			// properties.put("schedule.air", "0 0 */1 * * *");
+			// properties.put("schedule.weather", "0 0 */1 * * *");
+			//
+			// postProcessor.postProcessAfterInitialization(scheduler, SCHEDULED_TASKS);
 
-			postProcessor.postProcessAfterInitialization(scheduler, SCHEDULED_TASKS);
+			scheduler.timerRSSWeatherAir();
+
 			return ResponseEntity.status(HttpStatus.OK).body("scheduler 구동 완료");
 		} else {
 			postProcessor.postProcessBeforeDestruction(scheduler, SCHEDULED_TASKS);
