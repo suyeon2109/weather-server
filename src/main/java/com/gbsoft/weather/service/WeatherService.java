@@ -1,23 +1,24 @@
 package com.gbsoft.weather.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.List;
 
-import com.gbsoft.weather.mybatis.model.GetDustResponse;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.gbsoft.weather.exception.NoSuchAirDataException;
 import com.gbsoft.weather.exception.NoSuchCityException;
 import com.gbsoft.weather.mybatis.mapper.WeatherMapper;
+import com.gbsoft.weather.mybatis.model.CityNameVo;
+import com.gbsoft.weather.mybatis.model.GetDustResponse;
 import com.gbsoft.weather.mybatis.model.GetDustVo;
 import com.gbsoft.weather.mybatis.model.GetOneCallWeatherResponse;
 import com.gbsoft.weather.mybatis.model.GetOneCallWeatherVo;
 import com.gbsoft.weather.mybatis.model.GetWeatherVo;
+import com.gbsoft.weather.mybatis.model.GlobalLatLongVo;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -61,6 +62,12 @@ public class WeatherService {
         }
         return id;
     }
+
+    @Transactional(readOnly = true)
+    public List<Integer> getCityIdFromOpenWeather() {
+        return weatherMapper.getCityIdFromOpenWeather();
+    }
+
 
     public GetDustResponse getDust(int mainCityNum, int guNum, boolean grade) {
 
@@ -113,4 +120,16 @@ public class WeatherService {
                 .pm25Grade(pm25Grade)
                 .build();
     }
+
+    public List<CityNameVo> getCityName() {
+        return weatherMapper.getCityName();
+    }
+
+	public List<GlobalLatLongVo> getGlobalLatLong() {
+        return weatherMapper.getGlobalLatLong();
+	}
+
+	public int isThisMonthQueried(String thisMonth) {
+        return weatherMapper.getHolidayList(thisMonth+"%");
+	}
 }

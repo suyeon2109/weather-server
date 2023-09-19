@@ -1,5 +1,7 @@
 package com.gbsoft.weather.controller;
 
+import java.util.Properties;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
@@ -32,12 +34,13 @@ public class WeatherController {
 	public ResponseEntity weatherParsing(@RequestBody AuthCheckDto authCheckDto) throws Exception {
 		if("GB_WEATHER_SERVER_TIMER_START_REQUEST".equals(authCheckDto.getAuth())){
 			// Properties properties = System.getProperties();
-			// properties.put("schedule.air", "0 0 */1 * * *");
-			// properties.put("schedule.weather", "0 0 */1 * * *");
+			// properties.put("schedule.air", "0 0 */2 * * *");	// 2시간 마다
+			// properties.put("schedule.weather", "0 0 * * * *");	// 1시간 마다
+			// properties.put("schedule.holiday", "0 0 0 * * *");	// 하루 한번 0시에
 			//
 			// postProcessor.postProcessAfterInitialization(scheduler, SCHEDULED_TASKS);
 
-			scheduler.timerRSSWeatherAir();
+			scheduler.getMonthlyHoliday();
 
 			return ResponseEntity.status(HttpStatus.OK).body("scheduler 구동 완료");
 		} else {

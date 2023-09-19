@@ -186,4 +186,121 @@
 		  ,updateTime = #{updateTime}
 		WHERE CityId = #{cityId}
 	</update>
+
+	<select id="getCityIdFromOpenWeather" resultType="Integer">
+		SELECT cityId
+		FROM OPENWEATHER_HOURLY
+		ORDER BY cityId ASC
+	</select>
+
+	<update id="saveOpenWeatherHourlyToDB" parameterType="com.gbsoft.weather.dto.OpenWeatherHourlyDto">
+		UPDATE OPENWEATHER_HOURLY
+		SET current = #{current}
+			,hour1 = #{hour1}
+			,hour2 = #{hour2}
+			,hour3 = #{hour3}
+			,hour4 = #{hour4}
+			,hour5 = #{hour5}
+			,hour6 = #{hour6}
+			,updateTime = #{updateTime}
+		WHERE cityId = #{cityId}
+	</update>
+
+	<update id="saveTodayMinMaxTempToDB" parameterType="com.gbsoft.weather.dto.TodayMinMaxTempDto">
+		UPDATE TODAY_MIN_MAX_TEMP
+		SET date = #{date}
+		  ,maxTemp = #{maxTemp}
+		  ,minTemp = #{minTemp}
+		  ,updateTime = #{updateTime}
+		WHERE cityId = #{cityId}
+	</update>
+
+	<select id="getGlobalLatLong" resultType="GlobalLatLongVo">
+		SELECT Id, countryCode, cityCode, Latitude, Longitude, cityName, UTC
+		FROM global_latlong
+		ORDER BY Id asc
+	</select>
+
+	<update id="saveGlobalWeatherToDB" parameterType="com.gbsoft.weather.dto.GlobalWeatherDto">
+		UPDATE global_weather
+		SET updateTimeKr = #{updateTimeKr}
+		  ,countryCode = #{countryCode}
+		  ,cityCode = #{cityCode}
+		  ,pm25 = #{pm25}
+		  ,pm10 = #{pm10}
+		  ,Today = #{today}
+		  ,minTemp = #{minTemp}
+		  ,maxTemp = #{maxTemp}
+		  ,currentTemp = #{currentTemp}
+		  ,currentMain = #{currentMain}
+		  ,currentDesc = #{currentDesc}
+		  ,currentIcon = #{currentIcon}
+		  ,hour1Time = #{hour1Time}
+		  ,hour1Temp = #{hour1Temp}
+		  ,hour1Icon = #{hour1Icon}
+		  ,hour2Time = #{hour2Time}
+		  ,hour2Temp = #{hour2Temp}
+		  ,hour2Icon = #{hour2Icon}
+		  ,hour3Time = #{hour3Time}
+		  ,hour3Temp = #{hour3Temp}
+		  ,hour3Icon = #{hour3Icon}
+		  ,week1TMax = #{week1TMax}
+		  ,week1TMin = #{week1TMin}
+		  ,week1Desc = #{week1Desc}
+		  ,week1Icon = #{week1Icon}
+		  ,week2TMax = #{week2TMax}
+		  ,week2TMin = #{week2TMin}
+		  ,week2Desc = #{week2Desc}
+		  ,week2Icon = #{week2Icon}
+		  ,week3TMax = #{week3TMax}
+		  ,week3TMin = #{week3TMin}
+		  ,week3Desc = #{week3Desc}
+		  ,week3Icon = #{week3Icon}
+		  ,week4TMax = #{week4TMax}
+		  ,week4TMin = #{week4TMin}
+		  ,week4Desc = #{week4Desc}
+		  ,week4Icon = #{week4Icon}
+		  ,week5TMax = #{week5TMax}
+		  ,week5TMin = #{week5TMin}
+		  ,week5Desc = #{week5Desc}
+		  ,week5Icon = #{week5Icon}
+		  ,week6TMax = #{week6TMax}
+		  ,week6TMin = #{week6TMin}
+		  ,week6Desc = #{week6Desc}
+		  ,week6Icon = #{week6Icon}
+		  ,week7TMax = #{week7TMax}
+		  ,week7TMin = #{week7TMin}
+		  ,week7Desc = #{week7Desc}
+		  ,week7Icon = #{week7Icon}
+		  ,currentHumidity = #{currentHumidity}
+		  ,12am = #{valueOf12am}
+		  ,3am = #{valueOf3am}
+		  ,6am = #{valueOf6am}
+		  ,9am = #{valueOf9am}
+		  ,12pm = #{valueOf12pm}
+		  ,3pm = #{valueOf3pm}
+		  ,6pm = #{valueOf6pm}
+		  ,9pm = #{valueOf9pm}
+		  ,week1 = #{week1}
+		  ,week2 = #{week2}
+		  ,week3 = #{week3}
+		  ,week4 = #{week4}
+		  ,week5 = #{week5}
+		  ,week6 = #{week6}
+		  ,week7 = #{week7}
+		WHERE Id = #{id}
+	</update>
+
+	<select id="getHolidayList" resultType="Integer">
+		SELECT count(*)
+		FROM holiday_mnt
+		WHERE date LIKE #{thisMonth}
+	</select>
+
+	<insert id="saveHolidayToDb" parameterType="List">
+		<foreach collection = 'list' index='index' item ='item' separator=';'>
+			INSERT INTO holiday_mnt(date, comment)
+			VALUES (concat(substr(#{item.locdate},1,4),'-',substr(#{item.locdate},5,2),'-',substr(#{item.locdate},7,2)), #{item.dateName})
+		</foreach>
+	</insert>
 </mapper>
