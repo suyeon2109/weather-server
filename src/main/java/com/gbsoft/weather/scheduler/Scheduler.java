@@ -894,7 +894,7 @@ public class Scheduler {
 			.build();
 	}
 
-	// @Scheduled(cron = "${schedule.holiday}")
+	@Scheduled(cron = "${schedule.holiday}")
 	public void getMonthlyHoliday() throws IOException {
 		log.info("schedule.holiday");
 
