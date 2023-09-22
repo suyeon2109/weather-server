@@ -104,14 +104,14 @@
 					WHERE CityId = #{item.cityId}
 				</foreach>
 			</when>
-			<otherwise>
-				UPDATE AIRQUALITY_INFO
-				SET Date = '-'
-				,FineDustConcentration = '-'
-				,UltrafineDustConcentration = '-'
-				,OzoneConcentration = '-'
-				WHERE CityId between #{initialNum} and #{finalNum}
-			</otherwise>
+<!--			<otherwise>-->
+<!--				UPDATE AIRQUALITY_INFO-->
+<!--				SET Date = '-'-->
+<!--				,FineDustConcentration = '-'-->
+<!--				,UltrafineDustConcentration = '-'-->
+<!--				,OzoneConcentration = '-'-->
+<!--				WHERE CityId between #{initialNum} and #{finalNum}-->
+<!--			</otherwise>-->
 		</choose>
 	</update>
 
