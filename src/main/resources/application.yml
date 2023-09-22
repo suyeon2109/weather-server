@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8086
   servlet:
     context-path: /
 
@@ -35,7 +35,7 @@ management:
     env:
       enabled: true
   server:
-    port: 8080
+    port: 8086
 #    port: 9092
   endpoint:
     shutdown:
@@ -55,6 +55,7 @@ info:
 schedule:
   air : "-"
   weather : "-"
+  holiday : "-"
 
 weather:
   RSS_URL_SHORT : "http://www.kma.go.kr/wid/queryDFSRSS.jsp?zone="
@@ -66,9 +67,17 @@ weather:
   CURRENT_URL : "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey="
   WEATHER_API_KEY : "1YkkBU6dBKGpwzifiHej9eG2eB46HOiiwptb2O%2FHMoOmjlR9je3XX2%2BogeVDTHzJDKn%2FvB5HFozF6UegC%2F3wjQ%3D%3D"
 
+  GLOBALWEATHER_API_KEY : "f01b3e44f7e11b8c45cdceb0727ef5ef"
+  GLOBALWEATHER_URL1 : "https://api.openweathermap.org/data/2.5/onecall?"
+  GLOBALWEATHER_URL2 : "&exclude=minutely,alerts&appid="
+  GLOBALAIR_URL1 : "http://api.openweathermap.org/data/2.5/air_pollution?"
+
   MAIN_CITY_TOTAL_NUM : 17
   GU_NUM_COUNT : 25, 18, 42, 22, 24, 5, 8, 5, 16, 1, 5, 10, 22, 15, 2, 16, 14
   SHORT_CITY_NAME : 서울, 강원, 경기, 경남, 경북, 광주, 대구, 대전, 부산, 세종, 울산, 인천, 전남, 전북, 제주, 충남, 충북
   CITY_NAME : 서울특별시, 강원도, 경기도, 경상남도, 경상북도, 광주광역시, 대구광역시, 대전광역시, 부산광역시, 세종특별자치시, 울산광역시, 인천광역시, 전라남도, 전라북도, 제주특별자치도, 충청남도, 충청북도
   CITY_NAME_ENG : Seoul, Gangwon-do, Gyeonggi-do, Gyeongsangnam-do, Gyeongsangbuk-do, Gwangju, Daegu, Daegeon, Busan, Sejong, Ulsan, Incheon, Jeollanam-do, Jeollabuk-do, Jeju-do, Chungcheongnam-do, Chungcheongbuk-do
   RSS_LONG_CODE : 109, 105, 109, 159, 143, 156, 143, 133, 159, 133, 159, 109, 156, 146, 184, 133, 131
+
+  HOLIDAY_API_URL : "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?"
+  HOLIDAY_API_KEY : "1YkkBU6dBKGpwzifiHej9eG2eB46HOiiwptb2O%2FHMoOmjlR9je3XX2%2BogeVDTHzJDKn%2FvB5HFozF6UegC%2F3wjQ%3D%3D"

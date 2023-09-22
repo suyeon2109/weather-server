@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RestController
 public class WeatherController {
-	private final WeatherService weatherService;
 	private static final String SCHEDULED_TASKS = "scheduledTasks";
 
 	private final ScheduledAnnotationBeanPostProcessor postProcessor;

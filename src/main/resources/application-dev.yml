@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8086
   servlet:
     context-path: /
 
@@ -39,7 +39,7 @@ management:
     env:
       enabled: true
   server:
-    port: 8080
+    port: 8086
 #    port: 9092
   endpoint:
     shutdown:
