@@ -5,12 +5,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:log4jdbc:mariadb://3.39.57.164:3306/weather?allowMultiQueries=true
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:mariadb://3.39.57.164:3306/weather?allowMultiQueries=true
+    driver-class-name: org.mariadb.jdbc.Driver
     username: weather
     password: wlql12!
-    hikari:
-      max-lifetime: 1780000 # hikari는 RDS wait_timeout 보다 2 ~ 3초 정도 짧게 줄 것을 권장
 
 logging:
   level:
