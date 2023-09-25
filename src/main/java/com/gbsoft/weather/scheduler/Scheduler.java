@@ -186,7 +186,7 @@ public class Scheduler {
 			}
 			return list;
 		} catch (JSONException e) {
-			log.error("========= JSON Parsing error ==========");
+			log.error("========= AirData JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
 			return new ArrayList<>();
@@ -222,7 +222,8 @@ public class Scheduler {
 			weatherMapper.saveWeatherInfoToDB(weatherInfoDto);
 			weatherMapper.saveWeatherInfoRssToDB(weatherInfoRssDto);
 
-			log.debug("WeatherInfo, WeatherInfoRss - cityId {} update finished", initialNum+guNum);
+			// log.debug("WeatherInfo, WeatherInfoRss - cityId {} update finished", initialNum+guNum);
+			log.info("WeatherInfo, WeatherInfoRss - cityId {} update finished", initialNum+guNum);
 		}
 	}
 
@@ -287,7 +288,7 @@ public class Scheduler {
 				.cityId(cityId)
 				.build();
 		} catch (JSONException e) {
-			log.error("========= JSON Parsing error ==========");
+			log.error("========= ShortWeather JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
 			return ShortWeatherParsingResult.builder().build();
@@ -435,7 +436,8 @@ public class Scheduler {
 
 		if(null != openWeatherHourlyDto.getCurrent()){
 			weatherMapper.saveOpenWeatherHourlyToDB(openWeatherHourlyDto);
-			log.debug("OpenWeatherHourly - cityId {} update finished", cityId);
+			// log.debug("OpenWeatherHourly - cityId {} update finished", cityId);
+			log.info("OpenWeatherHourly - cityId {} update finished", cityId);
 		}
 	}
 
@@ -544,7 +546,7 @@ public class Scheduler {
 				.updateTime(LocalDateTime.now().toString().replaceAll("-","").replaceAll("T", " ").substring(0,17))
 				.build();
 		} catch (JSONException e) {
-			log.error("========= JSON Parsing error ==========");
+			log.error("========= CurrentWeather JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
 			return OpenWeatherHourlyDto.builder().build();
@@ -605,7 +607,8 @@ public class Scheduler {
 
 		if(null != todayMinMaxTempDto.getMaxTemp()){
 			weatherMapper.saveTodayMinMaxTempToDB(todayMinMaxTempDto);
-			log.debug("TodayMinMaxTemp - cityId {} update finished", cityId);
+			// log.debug("TodayMinMaxTemp - cityId {} update finished", cityId);
+			log.info("TodayMinMaxTemp - cityId {} update finished", cityId);
 		}
 	}
 	private StringBuilder getYesterdayUrl(Integer cityId) {
@@ -663,7 +666,7 @@ public class Scheduler {
 				.updateTime(todayDateTime.toString().replaceAll("-", "").replaceAll("T", " ").substring(0, 17))
 				.build();
 		} catch (JSONException e) {
-			log.error("========= JSON Parsing error ==========");
+			log.error("========= TodayMinMaxTemp JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
 			return TodayMinMaxTempDto.builder().build();
@@ -695,7 +698,8 @@ public class Scheduler {
 				GlobalWeatherDto globalWeatherDto = makeGlobalWeatherDto(globalWeatherResult, globalAirResult, g);
 				weatherMapper.saveGlobalWeatherToDB(globalWeatherDto);
 
-				log.debug("Global Weather - Id {} update finished", g.getId());
+				// log.debug("Global Weather - Id {} update finished", g.getId());
+				log.info("Global Weather - Id {} update finished", g.getId());
 			}
 		}
 	}
@@ -760,7 +764,7 @@ public class Scheduler {
 				.hour(hour)
 				.weather(weather).build();
 		} catch (JSONException e) {
-			log.error("========= JSON Parsing error ==========");
+			log.error("========= GlobalWeather JSON Parsing error ==========");
 			log.error("WeatherData = {}", weatherResponse);
 			log.error(e.getMessage());
 			return GlobalWeatherParsingResult.builder().build();
@@ -774,7 +778,7 @@ public class Scheduler {
 			JSONObject pmObj = ((JSONObject)list.get(0)).getJSONObject("components");
 			return pmObj;
 		} catch (JSONException e) {
-			log.error("========= JSON Parsing error ==========");
+			log.error("========= GlobalAirData JSON Parsing error ==========");
 			log.error("AirData = {}", airResponse);
 			log.error(e.getMessage());
 			return new JSONObject();
@@ -922,7 +926,8 @@ public class Scheduler {
 		if (!resultList.isEmpty()) {
 			weatherMapper.saveHolidayToDb(resultList);
 
-			log.debug("MonthlyHoliday {}-{} update finished", year, String.format("%02d",month));
+			// log.debug("MonthlyHoliday {}-{} update finished", year, String.format("%02d",month));
+			log.info("MonthlyHoliday {}-{} update finished", year, String.format("%02d",month));
 		}
 	}
 
