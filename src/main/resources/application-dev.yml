@@ -85,3 +85,5 @@ weather:
 
   HOLIDAY_API_URL : "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?"
   HOLIDAY_API_KEY : "1YkkBU6dBKGpwzifiHej9eG2eB46HOiiwptb2O%2FHMoOmjlR9je3XX2%2BogeVDTHzJDKn%2FvB5HFozF6UegC%2F3wjQ%3D%3D"
+
+  WEBHOOK_URL : "https://hooks.slack.com/services/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"

@@ -1,5 +1,6 @@
 package com.gbsoft.weather.scheduler;
 
+import static com.slack.api.webhook.WebhookPayloads.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.BufferedReader;
@@ -44,6 +45,9 @@ import com.gbsoft.weather.mybatis.mapper.WeatherMapper;
 import com.gbsoft.weather.mybatis.model.CityNameVo;
 import com.gbsoft.weather.mybatis.model.GlobalLatLongVo;
 import com.gbsoft.weather.service.WeatherService;
+import com.slack.api.Slack;
+import com.slack.api.model.Attachment;
+import com.slack.api.model.Field;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +93,8 @@ public class Scheduler {
 	private String holidayApiUrl;
 	@Value("${weather.HOLIDAY_API_KEY}")
 	private String holidayApiKey;
+	@Value("${weather.WEBHOOK_URL}")
+	private String webhookUrl;
 
 
 
@@ -160,7 +166,7 @@ public class Scheduler {
 		}
 	}
 
-	private List<Map<String, Object>> parseAirData(String data, int initialNum, int count) {
+	private List<Map<String, Object>> parseAirData(String data, int initialNum, int count) throws IOException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -189,10 +195,33 @@ public class Scheduler {
 			log.error("========= AirData JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
+			sendSlackMessage("AirData JSON Parsing error", data);
 			return new ArrayList<>();
 		}
 	}
 
+	private void sendSlackMessage(String title, String message) throws IOException {
+		Slack slack = Slack.getInstance();
+		slack.send(webhookUrl, payload(p -> p
+			.attachments(
+				List.of(generateSlackAttachment(title, message))
+			)
+		));
+	}
+
+	private Attachment generateSlackAttachment(String title, String message) {
+		return Attachment.builder()
+			.color("ff0000") // 빨간색
+			.title(title)
+			.fields(List.of(Field.builder()
+					.title("Error message")
+					.value(message)
+					.valueShortEnough(false)
+					.build()
+				)
+			)
+			.build();
+	}
 	private void getWeatherData(int mainCityNum, int guNum) throws IOException {
 		int initialNum = weatherService.getCityIdForDB(mainCityNum);
 		String shortWeatherResponse = getShortWeatherResponse(initialNum, guNum);
@@ -243,7 +272,7 @@ public class Scheduler {
 		return requestUrl(urlBuilder);
 	}
 
-	private ShortWeatherParsingResult parseShortWeather(String data, int cityId) {
+	private ShortWeatherParsingResult parseShortWeather(String data, int cityId) throws IOException {
 		try {
 			JSONObject jObject = XML.toJSONObject(data);
 			JSONObject body = jObject.getJSONObject("rss").getJSONObject("channel").getJSONObject("item").getJSONObject("description").getJSONObject("body");
@@ -288,9 +317,10 @@ public class Scheduler {
 				.cityId(cityId)
 				.build();
 		} catch (JSONException e) {
-			log.error("========= ShortWeather JSON Parsing error ==========");
+			log.error("========= ShortWeather(WeatherInfo) JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
+			sendSlackMessage("ShortWeather(WeatherInfo) JSON Parsing error", data);
 			return ShortWeatherParsingResult.builder().build();
 		}
 	}
@@ -484,7 +514,7 @@ public class Scheduler {
 	}
 
 
-	private OpenWeatherHourlyDto parseCurrentWeather(Integer cityId, String data, int hour) {
+	private OpenWeatherHourlyDto parseCurrentWeather(Integer cityId, String data, int hour) throws IOException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -546,9 +576,10 @@ public class Scheduler {
 				.updateTime(LocalDateTime.now().toString().replaceAll("-","").replaceAll("T", " ").substring(0,17))
 				.build();
 		} catch (JSONException e) {
-			log.error("========= CurrentWeather JSON Parsing error ==========");
+			log.error("========= CurrentWeather(OpenWeatherHourly) JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
+			sendSlackMessage("CurrentWeather(OpenWeatherHourly) JSON Parsing error", data);
 			return OpenWeatherHourlyDto.builder().build();
 		}
 	}
@@ -627,7 +658,7 @@ public class Scheduler {
 		return urlBuilder;
 	}
 
-	private TodayMinMaxTempDto parseTodayMinMaxTemp(Integer cityId, String data) {
+	private TodayMinMaxTempDto parseTodayMinMaxTemp(Integer cityId, String data) throws IOException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -669,6 +700,7 @@ public class Scheduler {
 			log.error("========= TodayMinMaxTemp JSON Parsing error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
+			sendSlackMessage("TodayMinMaxTemp JSON Parsing error", data);
 			return TodayMinMaxTempDto.builder().build();
 		}
 	}
@@ -704,7 +736,7 @@ public class Scheduler {
 		}
 	}
 
-	private GlobalWeatherParsingResult parseWeatherResponse(String weatherResponse, int utc) {
+	private GlobalWeatherParsingResult parseWeatherResponse(String weatherResponse, int utc) throws IOException {
 		try {
 			JSONObject weatherObj = new JSONObject(weatherResponse);
 			JSONObject current = weatherObj.getJSONObject("current");
@@ -767,11 +799,12 @@ public class Scheduler {
 			log.error("========= GlobalWeather JSON Parsing error ==========");
 			log.error("WeatherData = {}", weatherResponse);
 			log.error(e.getMessage());
+			sendSlackMessage("GlobalWeather JSON Parsing error", weatherResponse);
 			return GlobalWeatherParsingResult.builder().build();
 		}
 	}
 
-	private JSONObject parseAirResponse(String airResponse) {
+	private JSONObject parseAirResponse(String airResponse) throws IOException {
 		try{
 			JSONObject airObj = new JSONObject(airResponse);
 			JSONArray list = airObj.getJSONArray("list");
@@ -781,6 +814,7 @@ public class Scheduler {
 			log.error("========= GlobalAirData JSON Parsing error ==========");
 			log.error("AirData = {}", airResponse);
 			log.error(e.getMessage());
+			sendSlackMessage("GlobalAirData JSON Parsing error", airResponse);
 			return new JSONObject();
 		}
 	}
@@ -931,7 +965,7 @@ public class Scheduler {
 		}
 	}
 
-	private List<Map<String, Object>> parseHolidayData(String data, int year, int month) {
+	private List<Map<String, Object>> parseHolidayData(String data, int year, int month) throws IOException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -968,6 +1002,7 @@ public class Scheduler {
 			log.error("========= getMonthlyHoliday : error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
+			sendSlackMessage("getMonthlyHoliday JSON Parsing error", data);
 			return new ArrayList<>();
 		}
 	}
