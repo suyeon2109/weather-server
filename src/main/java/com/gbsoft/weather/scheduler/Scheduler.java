@@ -125,7 +125,7 @@ public class Scheduler {
 
 		if (!list.isEmpty()) {
 			weatherMapper.saveAirDataToDB(list, initialNum, initialNum+count);
-			log.info("AirQualityInfo - cityId {} to {} update finished", initialNum, initialNum+count-1);
+			log.debug("AirQualityInfo - cityId {} to {} update finished", initialNum, initialNum+count-1);
 		}
 	}
 
@@ -221,7 +221,7 @@ public class Scheduler {
 			weatherMapper.saveWeatherInfoToDB(weatherInfoDto);
 			weatherMapper.saveWeatherInfoRssToDB(weatherInfoRssDto);
 
-			log.info("WeatherInfo, WeatherInfoRss - cityId {} update finished", initialNum+guNum);
+			log.debug("WeatherInfo, WeatherInfoRss - cityId {} update finished", initialNum+guNum);
 		}
 	}
 
@@ -434,7 +434,7 @@ public class Scheduler {
 
 		if(null != openWeatherHourlyDto.getCurrent()){
 			weatherMapper.saveOpenWeatherHourlyToDB(openWeatherHourlyDto);
-			log.info("OpenWeatherHourly - cityId {} update finished", cityId);
+			log.debug("OpenWeatherHourly - cityId {} update finished", cityId);
 		}
 	}
 
@@ -604,7 +604,7 @@ public class Scheduler {
 
 		if(null != todayMinMaxTempDto.getMaxTemp()){
 			weatherMapper.saveTodayMinMaxTempToDB(todayMinMaxTempDto);
-			log.info("TodayMinMaxTemp - cityId {} update finished", cityId);
+			log.debug("TodayMinMaxTemp - cityId {} update finished", cityId);
 		}
 	}
 	private StringBuilder getYesterdayUrl(Integer cityId) {
@@ -694,7 +694,7 @@ public class Scheduler {
 				GlobalWeatherDto globalWeatherDto = makeGlobalWeatherDto(globalWeatherResult, globalAirResult, g);
 				weatherMapper.saveGlobalWeatherToDB(globalWeatherDto);
 
-				log.info("Global Weather - Id {} update finished", g.getId());
+				log.debug("Global Weather - Id {} update finished", g.getId());
 			}
 		}
 	}
@@ -921,7 +921,7 @@ public class Scheduler {
 		if (!resultList.isEmpty()) {
 			weatherMapper.saveHolidayToDb(resultList);
 
-			log.info("MonthlyHoliday {}-{} update finished", year, String.format("%02d",month));
+			log.debug("MonthlyHoliday {}-{} update finished", year, String.format("%02d",month));
 		}
 	}
 
