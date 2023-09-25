@@ -33,13 +33,9 @@ public class WeatherController {
 	public ResponseEntity weatherParsing(@RequestBody AuthCheckDto authCheckDto) throws Exception {
 		if("GB_WEATHER_SERVER_TIMER_START_REQUEST".equals(authCheckDto.getAuth())){
 			Properties properties = System.getProperties();
-			// properties.put("schedule.air", "0 0 */2 * * *");	// 2시간 마다
-			// properties.put("schedule.weather", "0 0 * * * *");	// 1시간 마다
-			// properties.put("schedule.holiday", "0 0 0 * * *");	// 하루 한번 0시에
-
-			properties.put("schedule.air", "0 */5 * * * *");
-			properties.put("schedule.weather", "0 */5 * * * *");
-			properties.put("schedule.holiday", "0 */5 * * * *");
+			properties.put("schedule.air", "0 0 */2 * * *");	// 2시간 마다
+			properties.put("schedule.weather", "0 0 * * * *");	// 1시간 마다
+			properties.put("schedule.holiday", "0 0 0 * * *");	// 하루 한번 0시에
 
 			postProcessor.postProcessAfterInitialization(scheduler, SCHEDULED_TASKS);
 
