@@ -18,10 +18,7 @@ logging:
     com.gbsoft.weather.controller: info
     com.tutorial: info
     com:samply:mybatis:mapper: info
-    org.hibernate.type: info #SQL 파라미터 파인딩 확인용\
-
-    pattern:
-      dateformat: yyyy-MM-dd HH:mm:ss.SSSz, Asia/Seoul
+    org.hibernate.type: info #SQL 파라미터 파인딩 확인용
 
 # mybatis settings
 mybatis:
