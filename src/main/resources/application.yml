@@ -12,7 +12,6 @@ spring:
     hikari:
       max-lifetime: 1780000 # hikari는 RDS wait_timeout 보다 2 ~ 3초 정도 짧게 줄 것을 권장
 
-
 logging:
   level:
     com.gbsoft.weather.controller: info

@@ -125,7 +125,8 @@ public class Scheduler {
 
 		if (!list.isEmpty()) {
 			weatherMapper.saveAirDataToDB(list, initialNum, initialNum+count);
-			log.debug("AirQualityInfo - cityId {} to {} update finished", initialNum, initialNum+count-1);
+			// log.debug("AirQualityInfo - cityId {} to {} update finished", initialNum, initialNum+count-1);
+			log.info("AirQualityInfo - cityId {} to {} update finished", initialNum, initialNum+count-1);
 		}
 	}
 
