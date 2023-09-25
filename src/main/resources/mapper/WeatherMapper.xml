@@ -93,26 +93,18 @@
 	</select>
 
 	<update id="saveAirDataToDB" parameterType="List">
-		<choose>
-			<when test="list != null and list.size() != 0">
-				<foreach collection = 'list' index='index' item ='item' separator=';'>
+		<if test="list != null and list.size() != 0">
+			<foreach collection = 'list' index='index' item ='item' separator=';'>
+				<if test="item.dataTime != null">
 					UPDATE AIRQUALITY_INFO
 					SET Date = #{item.dataTime}
 					,FineDustConcentration = #{item.pm10Value}
 					,UltrafineDustConcentration = #{item.pm25Value}
 					,OzoneConcentration = #{item.o3Value}
 					WHERE CityId = #{item.cityId}
-				</foreach>
-			</when>
-<!--			<otherwise>-->
-<!--				UPDATE AIRQUALITY_INFO-->
-<!--				SET Date = '-'-->
-<!--				,FineDustConcentration = '-'-->
-<!--				,UltrafineDustConcentration = '-'-->
-<!--				,OzoneConcentration = '-'-->
-<!--				WHERE CityId between #{initialNum} and #{finalNum}-->
-<!--			</otherwise>-->
-		</choose>
+				</if>
+			</foreach>
+		</if>
 	</update>
 
 

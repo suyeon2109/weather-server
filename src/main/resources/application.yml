@@ -10,7 +10,7 @@ spring:
     username: weather
     password: wlql12!
     hikari:
-      max-lifetime: 25800 # hikari는 RDS wait_timeout 보다 2 ~ 3초 정도 짧게 줄 것을 권장
+      max-lifetime: 1780000 # hikari는 RDS wait_timeout 보다 2 ~ 3초 정도 짧게 줄 것을 권장
 
 
 logging:
@@ -18,7 +18,10 @@ logging:
     com.gbsoft.weather.controller: info
     com.tutorial: info
     com:samply:mybatis:mapper: info
-    org.hibernate.type: info #SQL 파라미터 파인딩 확인용
+    org.hibernate.type: info #SQL 파라미터 파인딩 확인용\
+
+    pattern:
+      dateformat: yyyy-MM-dd HH:mm:ss.SSSz, Asia/Seoul
 
 # mybatis settings
 mybatis:
