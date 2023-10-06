@@ -192,10 +192,10 @@ public class Scheduler {
 			}
 			return list;
 		} catch (JSONException e) {
-			log.error("========= AirData JSON Parsing error ==========");
+			log.error("========= AirData error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
-			sendSlackMessage("AirData JSON Parsing error", data);
+			sendSlackMessage("AirData error", data);
 			return new ArrayList<>();
 		}
 	}
@@ -317,10 +317,10 @@ public class Scheduler {
 				.cityId(cityId)
 				.build();
 		} catch (JSONException e) {
-			log.error("========= ShortWeather(WeatherInfo) JSON Parsing error ==========");
+			log.error("========= ShortWeather(WeatherInfo) error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
-			sendSlackMessage("ShortWeather(WeatherInfo) JSON Parsing error", data);
+			sendSlackMessage("ShortWeather(WeatherInfo) error", data);
 			return ShortWeatherParsingResult.builder().build();
 		}
 	}
@@ -576,10 +576,10 @@ public class Scheduler {
 				.updateTime(LocalDateTime.now().toString().replaceAll("-","").replaceAll("T", " ").substring(0,17))
 				.build();
 		} catch (JSONException e) {
-			log.error("========= CurrentWeather(OpenWeatherHourly) JSON Parsing error ==========");
+			log.error("========= CurrentWeather(OpenWeatherHourly) error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
-			sendSlackMessage("CurrentWeather(OpenWeatherHourly) JSON Parsing error", data);
+			sendSlackMessage("CurrentWeather(OpenWeatherHourly) error", data);
 			return OpenWeatherHourlyDto.builder().build();
 		}
 	}
@@ -697,10 +697,10 @@ public class Scheduler {
 				.updateTime(todayDateTime.toString().replaceAll("-", "").replaceAll("T", " ").substring(0, 17))
 				.build();
 		} catch (JSONException e) {
-			log.error("========= TodayMinMaxTemp JSON Parsing error ==========");
+			log.error("========= TodayMinMaxTemp error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
-			sendSlackMessage("TodayMinMaxTemp JSON Parsing error", data);
+			sendSlackMessage("TodayMinMaxTemp error", data);
 			return TodayMinMaxTempDto.builder().build();
 		}
 	}
@@ -796,10 +796,10 @@ public class Scheduler {
 				.hour(hour)
 				.weather(weather).build();
 		} catch (JSONException e) {
-			log.error("========= GlobalWeather JSON Parsing error ==========");
+			log.error("========= GlobalWeather error ==========");
 			log.error("WeatherData = {}", weatherResponse);
 			log.error(e.getMessage());
-			sendSlackMessage("GlobalWeather JSON Parsing error", weatherResponse);
+			sendSlackMessage("GlobalWeather error", weatherResponse);
 			return GlobalWeatherParsingResult.builder().build();
 		}
 	}
@@ -811,10 +811,10 @@ public class Scheduler {
 			JSONObject pmObj = ((JSONObject)list.get(0)).getJSONObject("components");
 			return pmObj;
 		} catch (JSONException e) {
-			log.error("========= GlobalAirData JSON Parsing error ==========");
+			log.error("========= GlobalAirData error ==========");
 			log.error("AirData = {}", airResponse);
 			log.error(e.getMessage());
-			sendSlackMessage("GlobalAirData JSON Parsing error", airResponse);
+			sendSlackMessage("GlobalAirData error", airResponse);
 			return new JSONObject();
 		}
 	}
@@ -1002,7 +1002,7 @@ public class Scheduler {
 			log.error("========= getMonthlyHoliday : error ==========");
 			log.error("Data = {}", data);
 			log.error(e.getMessage());
-			sendSlackMessage("getMonthlyHoliday JSON Parsing error", data);
+			sendSlackMessage("getMonthlyHoliday error", data);
 			return new ArrayList<>();
 		}
 	}
