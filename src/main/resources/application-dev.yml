@@ -10,6 +10,20 @@ spring:
     username: gbadmin
     password: wlqlthvmxm1!
 
+# email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "suyeon2109@gmail.com"
+    password: "ysjv awki fuqm xnqp"
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+mail :
+  from : "suyeon2109@gmail.com"
+  to : "suyeon2109@gmail.com"
+
 logging:
   level:
     com.gbsoft.weather.controller: info

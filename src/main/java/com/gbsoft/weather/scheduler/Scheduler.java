@@ -6,6 +6,7 @@ import static java.nio.charset.StandardCharsets.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.URL;
@@ -24,15 +25,26 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.gbsoft.weather.dto.GlobalWeatherDto;
 import com.gbsoft.weather.dto.GlobalWeatherParsingResult;
@@ -95,11 +107,15 @@ public class Scheduler {
 	private String holidayApiKey;
 	@Value("${weather.WEBHOOK_URL}")
 	private String webhookUrl;
-
-
+	@Value("${mail.from}")
+	private String mailFrom;
+	@Value("${mail.to}")
+	private String mailTo;
 
 	private final WeatherService weatherService;
 	private final WeatherMapper weatherMapper;
+	private final JavaMailSender mailSender;
+
 	private List<CityNameVo> city;
 
 	@Scheduled(cron = "${schedule.air}")
@@ -114,7 +130,7 @@ public class Scheduler {
 		getGlobalAirWeather();
 	}
 
-	private void getAirData(int mainCityNum) throws IOException {
+	private void getAirData(int mainCityNum) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		StringBuilder urlBuilder = new StringBuilder(airApiUrl); /*URL*/
 		urlBuilder.append("?serviceKey=").append(airkoreaApiKey); /*Service Key*/
 		urlBuilder.append("&returnType=").append(URLEncoder.encode("json", UTF_8)); /*xml 또는 json*/
@@ -166,7 +182,7 @@ public class Scheduler {
 		}
 	}
 
-	private List<Map<String, Object>> parseAirData(String data, int initialNum, int count) throws IOException {
+	private List<Map<String, Object>> parseAirData(String data, int initialNum, int count) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -194,8 +210,11 @@ public class Scheduler {
 		} catch (JSONException e) {
 			log.error("========= AirData error ==========");
 			log.error("Data = {}", data);
-			log.error(e.getMessage());
-			sendSlackMessage("AirData error", data);
+
+			if (checkErrorCode(data)) {
+				sendSlackMessage("AirData error", data);
+				sendEmail("AirData error", data);
+			}
 			return new ArrayList<>();
 		}
 	}
@@ -207,6 +226,41 @@ public class Scheduler {
 				List.of(generateSlackAttachment(title, message))
 			)
 		));
+	}
+
+	private boolean checkErrorCode(String data) throws ParserConfigurationException, IOException, SAXException {
+		StringBuffer sb = new StringBuffer();
+		sb.append(data);
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.parse(new InputSource(new StringReader(sb.toString())));
+		int returnReasonCode = Integer.parseInt(document
+			.getElementsByTagName("returnReasonCode")
+			.item(0)
+			.getChildNodes()
+			.item(0)
+			.getNodeValue());
+
+		boolean result =
+			returnReasonCode == 12 || returnReasonCode == 21 || returnReasonCode == 30 || returnReasonCode == 31;
+		// 12 : 해당 오픈API 서비스가 없거나 폐기됨
+		// 21 : 일시적으로 사용할 수 없는 서비스 키
+		// 30 : 등록되지 않은 서비스키
+		// 31 : 기한 만료된 서비스키
+
+		return result;
+	}
+
+	private void sendEmail(String title, String content) throws MessagingException {
+		MimeMessage mail = mailSender.createMimeMessage();
+		MimeMessageHelper mailHelper = new MimeMessageHelper(mail, true, "UTF-8");
+
+		mailHelper.setFrom(mailFrom);
+		mailHelper.setTo(mailTo);
+		mailHelper.setSubject(title);
+		mailHelper.setText(content, true);
+
+		mailSender.send(mail);
 	}
 
 	private Attachment generateSlackAttachment(String title, String message) {
@@ -222,7 +276,7 @@ public class Scheduler {
 			)
 			.build();
 	}
-	private void getWeatherData(int mainCityNum, int guNum) throws IOException {
+	private void getWeatherData(int mainCityNum, int guNum) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		int initialNum = weatherService.getCityIdForDB(mainCityNum);
 		String shortWeatherResponse = getShortWeatherResponse(initialNum, guNum);
 		String longWeatherResponse = getLongWeatherResponse(mainCityNum);
@@ -272,7 +326,7 @@ public class Scheduler {
 		return requestUrl(urlBuilder);
 	}
 
-	private ShortWeatherParsingResult parseShortWeather(String data, int cityId) throws IOException {
+	private ShortWeatherParsingResult parseShortWeather(String data, int cityId) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		try {
 			JSONObject jObject = XML.toJSONObject(data);
 			JSONObject body = jObject.getJSONObject("rss").getJSONObject("channel").getJSONObject("item").getJSONObject("description").getJSONObject("body");
@@ -319,8 +373,11 @@ public class Scheduler {
 		} catch (JSONException e) {
 			log.error("========= ShortWeather(WeatherInfo) error ==========");
 			log.error("Data = {}", data);
-			log.error(e.getMessage());
-			sendSlackMessage("ShortWeather(WeatherInfo) error", data);
+
+			if (checkErrorCode(data)) {
+				sendSlackMessage("ShortWeather(WeatherInfo) error", data);
+				sendEmail("ShortWeather(WeatherInfo) error", data);
+			}
 			return ShortWeatherParsingResult.builder().build();
 		}
 	}
@@ -440,7 +497,7 @@ public class Scheduler {
 	}
 
 	@Scheduled(cron = "${schedule.weather}")
-	public void getHourlyWeather() throws IOException {
+	public void getHourlyWeather() throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		city = weatherService.getCityName();
 		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 		int hour = now.getHour();
@@ -455,7 +512,7 @@ public class Scheduler {
 		}
 	}
 
-	private void saveTodayWeatherData(Integer cityId) throws IOException {
+	private void saveTodayWeatherData(Integer cityId) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 		int hour = now.getHour();
 		StringBuilder currentUrl = getCurrentUrl(cityId, now);
@@ -514,7 +571,7 @@ public class Scheduler {
 	}
 
 
-	private OpenWeatherHourlyDto parseCurrentWeather(Integer cityId, String data, int hour) throws IOException {
+	private OpenWeatherHourlyDto parseCurrentWeather(Integer cityId, String data, int hour) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -578,8 +635,11 @@ public class Scheduler {
 		} catch (JSONException e) {
 			log.error("========= CurrentWeather(OpenWeatherHourly) error ==========");
 			log.error("Data = {}", data);
-			log.error(e.getMessage());
-			sendSlackMessage("CurrentWeather(OpenWeatherHourly) error", data);
+
+			if (checkErrorCode(data)) {
+				sendSlackMessage("CurrentWeather(OpenWeatherHourly) error", data);
+				sendEmail("CurrentWeather(OpenWeatherHourly) error", data);
+			}
 			return OpenWeatherHourlyDto.builder().build();
 		}
 	}
@@ -630,7 +690,7 @@ public class Scheduler {
 		}
 	}
 
-	private void getTodayMinMaxTemp(Integer cityId) throws IOException {
+	private void getTodayMinMaxTemp(Integer cityId) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		StringBuilder yesterdayUrl = getYesterdayUrl(cityId);
 
 		String response = requestUrl(yesterdayUrl);
@@ -658,7 +718,7 @@ public class Scheduler {
 		return urlBuilder;
 	}
 
-	private TodayMinMaxTempDto parseTodayMinMaxTemp(Integer cityId, String data) throws IOException {
+	private TodayMinMaxTempDto parseTodayMinMaxTemp(Integer cityId, String data) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -699,13 +759,16 @@ public class Scheduler {
 		} catch (JSONException e) {
 			log.error("========= TodayMinMaxTemp error ==========");
 			log.error("Data = {}", data);
-			log.error(e.getMessage());
-			sendSlackMessage("TodayMinMaxTemp error", data);
+
+			if (checkErrorCode(data)) {
+				sendSlackMessage("TodayMinMaxTemp error", data);
+				sendEmail("TodayMinMaxTemp error", data);
+			}
 			return TodayMinMaxTempDto.builder().build();
 		}
 	}
 
-	private void getGlobalAirWeather() throws IOException {
+	private void getGlobalAirWeather() throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		List<GlobalLatLongVo> globalLatLong = weatherService.getGlobalLatLong();
 
 		for (GlobalLatLongVo g : globalLatLong) {
@@ -736,7 +799,7 @@ public class Scheduler {
 		}
 	}
 
-	private GlobalWeatherParsingResult parseWeatherResponse(String weatherResponse, int utc) throws IOException {
+	private GlobalWeatherParsingResult parseWeatherResponse(String weatherResponse, int utc) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		try {
 			JSONObject weatherObj = new JSONObject(weatherResponse);
 			JSONObject current = weatherObj.getJSONObject("current");
@@ -798,13 +861,16 @@ public class Scheduler {
 		} catch (JSONException e) {
 			log.error("========= GlobalWeather error ==========");
 			log.error("WeatherData = {}", weatherResponse);
-			log.error(e.getMessage());
-			sendSlackMessage("GlobalWeather error", weatherResponse);
+
+			if (checkErrorCode(weatherResponse)) {
+				sendSlackMessage("GlobalWeather error", weatherResponse);
+				sendEmail("GlobalWeather error", weatherResponse);
+			}
 			return GlobalWeatherParsingResult.builder().build();
 		}
 	}
 
-	private JSONObject parseAirResponse(String airResponse) throws IOException {
+	private JSONObject parseAirResponse(String airResponse) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		try{
 			JSONObject airObj = new JSONObject(airResponse);
 			JSONArray list = airObj.getJSONArray("list");
@@ -813,8 +879,11 @@ public class Scheduler {
 		} catch (JSONException e) {
 			log.error("========= GlobalAirData error ==========");
 			log.error("AirData = {}", airResponse);
-			log.error(e.getMessage());
-			sendSlackMessage("GlobalAirData error", airResponse);
+
+			if (checkErrorCode(airResponse)) {
+				sendSlackMessage("GlobalAirData error", airResponse);
+				sendEmail("GlobalAirData error", airResponse);
+			}
 			return new JSONObject();
 		}
 	}
@@ -934,7 +1003,7 @@ public class Scheduler {
 	}
 
 	@Scheduled(cron = "${schedule.holiday}")
-	public void getMonthlyHoliday() throws IOException {
+	public void getMonthlyHoliday() throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		log.info("schedule.holiday");
 
 		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
@@ -947,7 +1016,7 @@ public class Scheduler {
 		}
 	}
 
-	private void getMonthlyHoliday(int year, int month) throws IOException {
+	private void getMonthlyHoliday(int year, int month) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		StringBuilder urlBuilder = new StringBuilder(holidayApiUrl);
 		urlBuilder.append("serviceKey=").append(holidayApiKey);
 		urlBuilder.append("&solYear=").append(URLEncoder.encode(String.format("%d", year), UTF_8));
@@ -965,7 +1034,7 @@ public class Scheduler {
 		}
 	}
 
-	private List<Map<String, Object>> parseHolidayData(String data, int year, int month) throws IOException {
+	private List<Map<String, Object>> parseHolidayData(String data, int year, int month) throws IOException, ParserConfigurationException, SAXException, MessagingException {
 		try {
 			JSONObject jObject = new JSONObject(data);
 			JSONObject response = jObject.getJSONObject("response");
@@ -1001,8 +1070,11 @@ public class Scheduler {
 		} catch (JSONException e) {
 			log.error("========= getMonthlyHoliday : error ==========");
 			log.error("Data = {}", data);
-			log.error(e.getMessage());
-			sendSlackMessage("getMonthlyHoliday error", data);
+
+			if (checkErrorCode(data)) {
+				sendSlackMessage("getMonthlyHoliday error", data);
+				sendEmail("getMonthlyHoliday error", data);
+			}
 			return new ArrayList<>();
 		}
 	}

@@ -27,6 +27,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'org.json:json:20190722'
     implementation 'com.slack.api:slack-api-client:1.32.1'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
